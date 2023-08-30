@@ -20,17 +20,16 @@ variable "target_environment" {
 }
 
 resource "aws_s3_object" "website_objects" {
-  for_each = fileset("./main", "**/*")  # Recursively get all files in the local "main" directory
+  for_each = fileset("./main", "**/*")
 
   bucket = var.website_bucket
-  key    = "${var.target_environment}/${each.value}"  # Upload each file to target path in S3 bucket
-  source = "./${each.value}"  # Local path to each file
+  key    = "${var.target_environment}/${each.value}"
+  source = "./${each.value}"
 }
 
 resource "aws_cloudfront_distribution" "website_distribution" {
-
   origin {
-    domain_name = var.website_bucket
+    domain_name = "${var.website_bucket}.s3.amazonaws.com"  # S3 bucket endpoint domain
     origin_id   = var.target_environment
   }
 
@@ -54,6 +53,17 @@ resource "aws_cloudfront_distribution" "website_distribution" {
     cloudfront_default_certificate = true
   }
 }
+
+output "environment_endpoints" {
+  value = aws_cloudfront_distribution.website_distribution.domain_name
+}
+In this modified code, I've updated the domain_name attribute in the origin block to include the correct S3 bucket endpoint domain ("${var.website_bucket}.s3.amazonaws.com"). This should resolve the "InvalidArgument: The parameter Origin DomainName does not refer to a valid S3 bucket" error you were facing.
+
+
+
+
+
+
 
 output "environment_endpoints" {
   value = aws_cloudfront_distribution.website_distribution.domain_name
