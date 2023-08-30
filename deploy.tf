@@ -20,7 +20,7 @@ variable "environments" {
   type        = list(string)
 }
 
-resource "aws_s3_bucket_object" "website_objects" {
+resource "aws_s3_object" "website_objects" {
   for_each = toset(var.environments)
 
   bucket = var.website_bucket
@@ -33,7 +33,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   count = length(var.environments)
 
   origin {
-    domain_name = aws_s3_bucket_object.website_objects[var.environments[count.index]].bucket
+    domain_name = aws_s3_object.website_objects[var.environments[count.index]].bucket
     origin_id   = var.environments[count.index]
   }
 
