@@ -15,6 +15,7 @@ jobs:
 
     env:
       WORKING_DIRECTORY: codebase/rdicidr-0.1.0 # change this to the directory with the source
+      ARTIFACT_S3_BUCKET: rdicidr-artifacts # change this to the name of the S3 bucket you want to upload to
 
     steps:
       - name: Checkout repository
@@ -44,3 +45,27 @@ jobs:
       - name: Build
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: npm run build
+
+      - name: Upload to S3
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: ${{ env.WORKING_DIRECTORY }}/build
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+
+      - name: Upload to S3
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws s3 cp ${{ env.WORKING_DIRECTORY }}/build s3://${{ env.ARTIFACT_S3_BUCKET }}/ --recursive
