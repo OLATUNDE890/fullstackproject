@@ -100,6 +100,9 @@ jobs:
         with:
           terraform_version: 1.5.6  # Change to the desired Terraform version
 
+      - name: Extract branch name
+        id: branch_name
+        run: echo "##[set-output name=branch;]$(basename ${{ github.ref }})"
       - name: Deploy Website with Terraform
         run: |
           terraform init
@@ -107,7 +110,7 @@ jobs:
             -var="aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var="aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var="website_bucket=${{ env.ARTIFACT_S3_BUCKET }}" \
-            -var="environments=[\"main\", \"devel\", \"stage\"]"
+            -var="target_environment=${{ steps.branch_name.outputs.branch }}"
 
       - name: Display Environment URLs
         run: |

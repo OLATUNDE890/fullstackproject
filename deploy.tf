@@ -15,26 +15,22 @@ variable "website_bucket" {
   description = "S3 bucket name containing website source code"
 }
 
-variable "environments" {
-  description = "List of environment names"
-  type        = list(string)
+variable "target_environment" {
+  description = "Environment to deploy"
 }
 
-resource "aws_s3_object" "website_objects" {
-  for_each = toset(var.environments)
-
+resource "aws_s3_object" "website_object" {
   bucket = var.website_bucket
-  key    = each.value
+  key    = target_environment
 
-  source = each.value
+  source = target_environment
 }
 
 resource "aws_cloudfront_distribution" "website_distribution" {
-  count = length(var.environments)
 
   origin {
-    domain_name = aws_s3_object.website_objects[var.environments[count.index]].bucket
-    origin_id   = var.environments[count.index]
+    domain_name = var.website_bucket
+    origin_id   = var.target_environment
   }
 
   enabled             = true
@@ -43,7 +39,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = var.environments[count.index]
+    target_origin_id = var.target_environment
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -59,7 +55,5 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 }
 
 output "environment_endpoints" {
-  value = { for idx, env in var.environments :
-    env => aws_cloudfront_distribution.website_distribution[idx].domain_name
-  }
+  value = aws_cloudfront_distribution.website_distribution.domain_name
 }
