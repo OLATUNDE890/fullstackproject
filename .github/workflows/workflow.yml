@@ -114,9 +114,7 @@ jobs:
 
       - name: Display Environment URLs
         run: |
-          echo "Main Environment URL: ${{ steps.deploy.outputs.environment_endpoints_main }}"
-          echo "Devel Environment URL: ${{ steps.deploy.outputs.environment_endpoints_devel }}"
-          echo "Stage Environment URL: ${{ steps.deploy.outputs.environment_endpoints_stage }}"
+          echo "Main Environment URL: ${{ steps.deploy.outputs.environment_endpoints }}"
         env:
           ENVIRONMENT_ENDPOINTS: ${{ steps.deploy.outputs.environment_endpoints }}
 
