@@ -41,6 +41,13 @@ resource "aws_cloudfront_distribution" "website_distribution" {
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = var.target_environment
     viewer_protocol_policy = "redirect-to-https"
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
   }
 
   restrictions {
