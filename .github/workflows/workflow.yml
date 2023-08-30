@@ -118,9 +118,7 @@ jobs:
           echo "Devel Environment URL: ${{ steps.deploy.outputs.environment_endpoints_devel }}"
           echo "Stage Environment URL: ${{ steps.deploy.outputs.environment_endpoints_stage }}"
         env:
-          ENVIRONMENT_ENDPOINTS_MAIN: ${{ fromJson(steps.deploy.outputs.environment_endpoints).main }}
-          ENVIRONMENT_ENDPOINTS_DEVEL: ${{ fromJson(steps.deploy.outputs.environment_endpoints).devel }}
-          ENVIRONMENT_ENDPOINTS_STAGE: ${{ fromJson(steps.deploy.outputs.environment_endpoints).stage }}
+          ENVIRONMENT_ENDPOINTS: ${{ steps.deploy.outputs.environment_endpoints }}
 
     outputs:
       environment_endpoints: ${{ steps.deploy.outputs.environment_endpoints }}
