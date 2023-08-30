@@ -98,7 +98,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.0.0  # Change to the desired Terraform version
+          terraform_version: 1.5.6  # Change to the desired Terraform version
 
       - name: Deploy Website with Terraform
         run: |
