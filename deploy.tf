@@ -57,14 +57,3 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 output "environment_endpoints" {
   value = aws_cloudfront_distribution.website_distribution.domain_name
 }
-In this modified code, I've updated the domain_name attribute in the origin block to include the correct S3 bucket endpoint domain ("${var.website_bucket}.s3.amazonaws.com"). This should resolve the "InvalidArgument: The parameter Origin DomainName does not refer to a valid S3 bucket" error you were facing.
-
-
-
-
-
-
-
-output "environment_endpoints" {
-  value = aws_cloudfront_distribution.website_distribution.domain_name
-}
