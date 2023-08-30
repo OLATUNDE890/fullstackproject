@@ -4,10 +4,14 @@ name: Codebase Workflow
 on:
   pull_request:
     branches:
-      - '*'
+      - main
+      - devel
+      - stage
   push:
     branches:
       - main
+      - devel
+      - stage
 env:
   WORKING_DIRECTORY: codebase/rdicidr-0.1.0 # change this to the directory with the source
   ARTIFACT_S3_BUCKET: rdicidr-artifacts # change this to the name of the S3 bucket you want to upload to
