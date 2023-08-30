@@ -56,7 +56,7 @@ jobs:
         with:
           name: build-artifact
           path: ${{ env.WORKING_DIRECTORY }}/build
-  deploy:
+  save-to-s3: # we could just deploy right to web with terraform, but best practice to keep build artifacts stored permanently
     needs: build-and-test
     runs-on: ubuntu-latest
 
@@ -85,3 +85,37 @@ jobs:
 
       - name: Upload to S3 branch folder
         run: aws s3 cp artifact s3://${{ env.ARTIFACT_S3_BUCKET }}/${{ steps.branch_name.outputs.branch }} --recursive
+  terraform-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0  # Change to the desired Terraform version
+
+      - name: Deploy Website with Terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -var="aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" \
+            -var="aws_secret_key=${{ secrets.AWS_SECRET_KEY }}" \
+            -var="website_bucket=${{ env.ARTIFACT_S3_BUCKET }}" \
+            -var="environments=[\"main\", \"devel\", \"stage\"]"
+
+      - name: Display Environment URLs
+        run: |
+          echo "Main Environment URL: ${{ steps.deploy.outputs.environment_endpoints_main }}"
+          echo "Devel Environment URL: ${{ steps.deploy.outputs.environment_endpoints_devel }}"
+          echo "Stage Environment URL: ${{ steps.deploy.outputs.environment_endpoints_stage }}"
+        env:
+          ENVIRONMENT_ENDPOINTS_MAIN: ${{ fromJson(steps.deploy.outputs.environment_endpoints).main }}
+          ENVIRONMENT_ENDPOINTS_DEVEL: ${{ fromJson(steps.deploy.outputs.environment_endpoints).devel }}
+          ENVIRONMENT_ENDPOINTS_STAGE: ${{ fromJson(steps.deploy.outputs.environment_endpoints).stage }}
+
+    outputs:
+      environment_endpoints: ${{ steps.deploy.outputs.environment_endpoints }}
+
