@@ -21,9 +21,9 @@ variable "target_environment" {
 
 resource "aws_s3_object" "website_object" {
   bucket = var.website_bucket
-  key    = target_environment
+  key    = var.target_environment
 
-  source = target_environment
+  source = var.target_environment
 }
 
 resource "aws_cloudfront_distribution" "website_distribution" {
