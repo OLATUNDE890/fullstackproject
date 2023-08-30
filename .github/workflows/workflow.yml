@@ -56,7 +56,9 @@ jobs:
         with:
           name: build-artifact
           path: ${{ env.WORKING_DIRECTORY }}/build
-  save-to-s3: # we could just deploy right to web with terraform, but best practice to keep build artifacts stored permanently
+  save-to-s3:
+    # we could just deploy right to web with terraform, but best practice to keep build artifacts stored permanently
+    # we also serve directly from s3 with cloudfront in terraform so we need them there anyway
     needs: build-and-test
     runs-on: ubuntu-latest
 

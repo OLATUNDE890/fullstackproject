@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
 }
 
 output "environment_endpoints" {
-  value = { for env in var.environments :
-    env => aws_cloudfront_distribution.website_distribution[env].domain_name
+  value = { for idx, env in var.environments :
+    env => aws_cloudfront_distribution.website_distribution[idx].domain_name
   }
 }
