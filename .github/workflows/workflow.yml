@@ -66,6 +66,7 @@ jobs:
 
       - name: Upload to S3
         run: |
+          set -x
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws s3 cp ${{ env.WORKING_DIRECTORY }}/build s3://${{ env.ARTIFACT_S3_BUCKET }}/ --recursive
