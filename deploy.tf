@@ -80,10 +80,10 @@ resource "aws_s3_bucket_policy" "public_bucket_policy" {
   })
 }
 
-resource "aws_s3_bucket_cors_rule" "public_cors_rule" {
+resource "aws_s3_bucket_cors_configuration" "public_cors_rule" {
   bucket = var.website_bucket
 
-  allowed_origins = ["${aws_cloudfront_distribution.website_distribution.domain_name}"]
+  allowed_origins = [aws_cloudfront_distribution.website_distribution.domain_name]
   allowed_methods = ["GET"]
   max_age_seconds = 3600
 }
