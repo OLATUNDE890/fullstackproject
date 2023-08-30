@@ -19,11 +19,12 @@ variable "target_environment" {
   description = "Environment to deploy"
 }
 
-resource "aws_s3_object" "website_object" {
-  bucket = var.website_bucket
-  key    = var.target_environment
+resource "aws_s3_object" "website_objects" {
+  for_each = fileset("./main", "**/*")  # Recursively get all files in the local "main" directory
 
-  source = var.target_environment
+  bucket = var.website_bucket
+  key    = "${var.target_environment}/${each.value}"  # Upload each file to target path in S3 bucket
+  source = "./${each.value}"  # Local path to each file
 }
 
 resource "aws_cloudfront_distribution" "website_distribution" {
